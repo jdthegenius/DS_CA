@@ -16,3 +16,6 @@ Since the server supports multiple client connections there is need for some of 
 # Client
 The client-side part of the application connects to the server thus enabling the user to perform actions like registration, login, send email, view inbox and view spam emails. The clients access the server resources and functionalities by opening a connection on the port on which the server socket is running. This makes it possible for the client to read and broadcast messages in the server.
 The client-side is the part of the application of the application that the user interacts with thus there is need for user interfaces that user uses to perform different actions. The client side has been designed using a combination of terminal or command line interfaces and GUI interfaces. 
+
+# Information exchange between the client and server
+Information exchange between client and server is done through serializable objects. A user object and email object are shared between the client and the server. For the server to process different requests, there has to be some sort of protocol. The designed protocol for this application uses a HashMap where the key is the request and the value of the hashmap is the serializable object. For example, during registration user object is sent with the request as register.
