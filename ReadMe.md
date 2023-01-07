@@ -1,1 +1,18 @@
-#Junaid Riaz's CA for Distributed Systems
+# Junaid Riaz's CA for Distributed Systems
+# Introduction
+This system is a client-server emailing system that allows users to share emails in one session. The project is made up of two subsystems each of which runs independently where the server listens for connections from the clients and accepts and fowards emails sent by the connected clients.
+# Server
+The server-side part of the application is the backbone of the email application. The server is designed to maintain communication between clients and to maintain data sent through the clients. The server has been designed to handle multiple clients through multi-threading. A connection to the server spawns a new thread that handles communication between the server and the client. By spawning a thread for every communication, the server is able to maintain a listener for every connection meaning that all the connected clients can interact with the server for multiple number of times. The following are the functionalities of the server;
+•	Storage of user data
+In order to maintain a record of all users that are registered to use the application, the server has to maintain a persistent storage structure that will store registered user details. This is achieved by user of a data file that is comma delimited. When a new client registers in the application, the server receives the information and stores the data in a file. This makes it possible for the user to login in the application another time as the data is persisted in the file.
+In order for the user to register, a user object has to be sent to the server. This is done using a serializable object of a user containing all the user object. By serializing the object, this makes it possible for the user object to be sent between the client and the server-side part of the application. The code of the object is shown in the appendix section of the report.
+•	Storage of emails
+Storage of emails involves using an in-memory data structure called Array List. This means that the emails are not persisted thus are only available as long as the server is running. This means that multiple clients can connect and disconnect as many times as possible and still find emails in their inbox or spam as long as the server is running. For a client to send an email to the server-side part of the application, the email object has to be serializable. The code of the serializable object is shown on the appendix section of the report.
+•	Handling multiple connections
+The server can handle multiple client connections and messages. This is achieved through multi-threading. A connection to the server spawns a new thread that handles communication between the server and the client. By spawning a thread for every communication, the server is able to maintain a listener for every connection meaning that all the connected clients can interact with the server for multiple number of times.
+•	Mutual exclusion
+Since the server supports multiple client connections there is need for some of synchronization since all the connected clients are accessing common objects. Coordination of access of the objects is achieved through thread synchronization.
+
+# Client
+The client-side part of the application connects to the server thus enabling the user to perform actions like registration, login, send email, view inbox and view spam emails. The clients access the server resources and functionalities by opening a connection on the port on which the server socket is running. This makes it possible for the client to read and broadcast messages in the server.
+The client-side is the part of the application of the application that the user interacts with thus there is need for user interfaces that user uses to perform different actions. The client side has been designed using a combination of terminal or command line interfaces and GUI interfaces. 
