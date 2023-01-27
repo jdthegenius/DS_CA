@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 public class Server {
     private static final int PORT = 9147; //port
-
+    static ArrayList<Email> emails=new ArrayList<>();
     public static void main(String[] args) throws Exception {
         System.out.println("Server started and running.....");
         ServerSocket listener = new ServerSocket(PORT);
@@ -34,7 +34,7 @@ public class Server {
         private ObjectInputStream in;
         private ObjectOutputStream out;
         Loader loader=new Loader();
-        ArrayList<Email> emails=new ArrayList<>();
+        
   
         public Handler(Socket socket) {
             this.socket = socket;
@@ -50,7 +50,7 @@ public class Server {
                 if(received.keySet().toString().equals("[registration]")){
                     User user= (User) received.get("registration");
                     loader.appendData("users.txt", user.toString());
-                    out.writeUTF("success");
+                    out.writeObject(user);
                 }else if(received.keySet().toString().equals("[login]")){
                     User user= (User) received.get("login");
                     String[] existing=loader.readFile("users.txt");
@@ -66,16 +66,23 @@ public class Server {
                 }else if(received.keySet().toString().equals("[send]")){
                     Email email=(Email)received.get("send");
                     emails.add(email);
-                    System.out.println("THe server has stored an email");
-                }else if(received.keySet().toString().equals("[send]")){
-                    User user=(User)received.get("send");
-                    ArrayList<Email> temp=new ArrayList<>();
-                    for(int i=0;i<emails.size();i++){
-                        if(emails.get(i).getRecipient().equalsIgnoreCase(user.getEmail())){
-                            temp.add(emails.get(i));
+                    //loader.SaveEmails(emails);
+                    System.out.println("THe server has stored an email and the current size is "+ emails.size());
+                }else if(received.keySet().toString().equals("[fetch]")){
+                    
+                    System.out.println("The server has received a fetch request and the current size of the inbox is "+emails.size());
+                    User session=(User)received.get("fetch");
+                    ArrayList<Email> inbox=new ArrayList<>();
+                    for(Email email:emails){
+                        if(email.getRecipient().equals(session.getEmail())){
+                            inbox.add(email);
+                            System.out.println(email.getMail()+" ---- Added");
+                        }else{
+                            System.out.println(email.getRecipient()+"====="+session.getEmail());
                         }
                     }
-                    out.writeObject(temp);
+                    System.out.println("The size to be sent back is "+inbox.size());
+                    out.writeObject(inbox);
                 }
             } catch (SocketException | NullPointerException e) {
                 System.out.println(e.getMessage());

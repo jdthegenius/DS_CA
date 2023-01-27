@@ -8,10 +8,7 @@ package rmi;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-/**
- *
- * @author kinut
- */
+
 public class User implements Serializable{
     private String username,name,email,password;
     private ArrayList<Email> inbox;

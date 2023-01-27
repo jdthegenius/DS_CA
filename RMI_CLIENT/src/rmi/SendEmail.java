@@ -15,21 +15,21 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import static rmi.ClientSide.socket;
 
-/**
- *
- * @author kinut
- */
+
 public class SendEmail extends javax.swing.JFrame {
 
     /**
      * Creates new form SendEmail
      */
     Socket socket;
-
-    public SendEmail(Socket socket) {
+    ObjectOutputStream streamOut;
+    ObjectInputStream streamIn;
+    public SendEmail(ObjectOutputStream StreamOut,ObjectInputStream streamIn) {
         initComponents();
         try {
             //this.socket = socket;
+            this.streamOut=streamOut;
+            this.streamIn=streamIn;
             this.socket=new Socket("localhost",9147);
         } catch (IOException ex) {
             Logger.getLogger(SendEmail.class.getName()).log(Level.SEVERE, null, ex);
@@ -53,6 +53,8 @@ public class SendEmail extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtMessage = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        txtSubject = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -73,6 +75,8 @@ public class SendEmail extends javax.swing.JFrame {
             }
         });
 
+        jLabel4.setText("SUBJECT");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -89,11 +93,13 @@ public class SendEmail extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel2)
-                                    .addComponent(jLabel3))
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4))
                                 .addGap(26, 26, 26)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtRecipient)
-                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))))))
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+                                    .addComponent(txtSubject))))))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -105,13 +111,16 @@ public class SendEmail extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtRecipient, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(31, 31, 31)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtSubject, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1))
         );
 
         pack();
@@ -120,13 +129,14 @@ public class SendEmail extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String recipient = txtRecipient.getText();
         String message = txtMessage.getText();
-        if (recipient.length() == 0 || message.length() == 0) {
-            JOptionPane.showMessageDialog(this, "Enter the email and the message");
+        String subject=txtSubject.getText();
+        if (recipient.length() == 0 || message.length() == 0 || subject.length()==0) {
+            JOptionPane.showMessageDialog(this, "Enter the email, subject and the message");
         } else {
-            Email email = new Email(ClientSide.session.getEmail(), recipient, message, "inbox");
+            Email email = new Email(Main.session.getEmail(), recipient,subject, message, "inbox");
             try {
-                ObjectOutputStream streamOut = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream streamIn = new ObjectInputStream(socket.getInputStream());
+                streamOut = new ObjectOutputStream(socket.getOutputStream());
+                streamIn = new ObjectInputStream(socket.getInputStream());
                 HashMap<String, Email> data = new HashMap();
                 data.put("send", email);
                 streamOut.writeObject(data);
@@ -138,48 +148,16 @@ public class SendEmail extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SendEmail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SendEmail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SendEmail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SendEmail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new SendEmail(null).setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea txtMessage;
     private javax.swing.JTextField txtRecipient;
+    private javax.swing.JTextField txtSubject;
     // End of variables declaration//GEN-END:variables
 }

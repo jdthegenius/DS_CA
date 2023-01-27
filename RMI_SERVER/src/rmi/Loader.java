@@ -4,9 +4,15 @@ package rmi;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +45,7 @@ public class Loader {
         }
     }
 
-    public void saveData(String filename, String[] data) {
+    public void saveData(String filename, ArrayList<Email> data) {
         BufferedWriter bw = null;
         FileWriter fw = null;
 
@@ -56,9 +62,9 @@ public class Loader {
             // true = append file
             fw = new FileWriter(file.getAbsoluteFile(), true);
             bw = new BufferedWriter(fw);
-            for (int i = 0; i < data.length; i++) {
-                bw.write(data[i]);
-                if (i < data.length - 1) {
+            for (int i = 0; i < data.size(); i++) {
+                bw.write(data.get(i).toString());
+                if (i < data.size() - 1) {
                     bw.write("\n");
                 }
             }
@@ -116,6 +122,55 @@ public class Loader {
             }
         }
     }
+    
+    public void SaveEmails(ArrayList<Email> emails){
+        FileOutputStream fos = null;
+        try {
+            File f = new File("./src/rmi/emails.ser");
+            fos = new FileOutputStream(f);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(emails);
+            oos.close();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    public  ArrayList<Email> LoadEmails(){
+        ArrayList<Email> emails = null;
+        FileInputStream fis = null;
+        try {
+            File f = new File("./src/rmi/emails.ser");
+                if(f.length()!=0){
+                fis = new FileInputStream(f);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                emails = (ArrayList) ois.readObject();
+                ois.close();
+            }
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                fis.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return emails;
+    }
+    
 }
 
 
