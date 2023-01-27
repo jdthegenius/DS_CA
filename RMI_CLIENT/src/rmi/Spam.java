@@ -15,6 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import static rmi.Inbox.emails;
 
 /**
  *
@@ -22,49 +24,17 @@ import javax.swing.JDialog;
  */
 public class Spam extends JDialog {
 
-    /**
-     * Creates new form MyInbox
-     */
-    static Socket socket;
-    static ObjectInputStream receiver;
-    static ObjectOutputStream sender;
-    static ArrayList<Email> emails;
-    static User session;
-    public Spam(Socket socket,User user) {
+    
+    DefaultListModel dlm=new DefaultListModel();
+    public Spam() {
         initComponents();
-        this.session=user;
-        try {
-            this.socket=new Socket("localhost",9147);
-            //this.emails=new ArrayList<>();
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Inbox.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println(ex.getMessage());
-        }
-        fetchInbox();
         populateInbox();
         this.setVisible(true);
         this.setAlwaysOnTop(true);
     }
-    public static void fetchInbox(){
-        try {
-            receiver=new ObjectInputStream(socket.getInputStream());
-            sender=new ObjectOutputStream(socket.getOutputStream());
-            HashMap<String,User> req=new HashMap<>();
-            req.put("fetch",session);
-            sender.writeObject(req);
-            emails=(ArrayList)receiver.readObject();
-        } catch (IOException ex) {
-            Logger.getLogger(Inbox.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Inbox.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
-    private void populateInbox(){
-        DefaultListModel dlm=new DefaultListModel();
-        for(int i=0;i<emails.size();i++){
-            dlm.addElement(ClientSide.inbox.get(i));
+    private  void populateInbox(){       
+        for(int i=0;i<Main.spam.size();i++){
+            dlm.addElement(Main.spam.get(i));    
         }
         listInbox.setModel(dlm);
     }
@@ -92,10 +62,25 @@ public class Spam extends JDialog {
         jLabel1.setText("MY SPAM");
 
         jButton1.setText("VIEW MAIL");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("DELETE");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("EMPTY SPAM");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         txtMessage.setColumns(20);
         txtMessage.setRows(5);
@@ -145,6 +130,33 @@ public class Spam extends JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        int index=listInbox.getSelectedIndex();
+        if(index<0){
+            JOptionPane.showMessageDialog(rootPane, "Select an the mail to view");
+        }else{
+            txtMessage.setText(emails.get(index).displayEmail());
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        int index=listInbox.getSelectedIndex();
+        if(index<0){
+            JOptionPane.showMessageDialog(rootPane, "Select an the mail to delete");
+        }else{
+            Main.spam.remove(index);
+            dlm.remove(index);
+            listInbox.setModel(dlm);
+            txtMessage.setText("");
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        dlm.clear();
+        listInbox.setModel(dlm);
+        Main.spam.removeAll(Main.spam);
+    }//GEN-LAST:event_jButton4ActionPerformed
 
   
 

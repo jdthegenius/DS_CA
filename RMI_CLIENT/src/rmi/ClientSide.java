@@ -10,16 +10,15 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author kinut
- */
+
 public class ClientSide{
     static Scanner scanner=new Scanner(System.in);
     static Socket socket;
     static ArrayList<Email> inbox=new ArrayList<>();
     static ArrayList<Email> spam=new ArrayList<>();
     static User session=null;
+    static ObjectOutputStream streamOut;
+    static ObjectInputStream streamIn;
     public static void main(String[] args){
         startConnection();
         mainMenu();
@@ -29,6 +28,8 @@ public class ClientSide{
         socket = null;
         try {
             socket = new Socket("localhost",9147);
+            streamOut = new ObjectOutputStream(socket.getOutputStream());
+            streamIn = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,8 +83,8 @@ public class ClientSide{
         String password=scanner.next();
         User user=new User(username,password);
         try {
-            ObjectOutputStream streamOut = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream streamIn = new ObjectInputStream(socket.getInputStream());
+            //ObjectOutputStream streamOut = new ObjectOutputStream(socket.getOutputStream());
+            //ObjectInputStream streamIn = new ObjectInputStream(socket.getInputStream());
             HashMap<String,User> data=new HashMap(); 
             data.put("login",user);
             streamOut.writeObject(data);
@@ -120,15 +121,15 @@ public class ClientSide{
         String choice=scanner.next();
         switch(choice){
             case "1":
-                new SendEmail(socket).setVisible(true);
+                new SendEmail(streamOut,streamIn).setVisible(true);
                 mailMenu();
                 break;
             case "2":
-                new Inbox(socket,session).setVisible(true);
+                new Inbox(streamOut,streamIn,session).setVisible(true);
                 mailMenu();
                 break;
             case "3":
-                new Spam(socket,session).setVisible(true);
+                new Spam().setVisible(true);
                 mailMenu();
                 break;
             case "4":
